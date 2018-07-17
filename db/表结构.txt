@@ -1,0 +1,86 @@
+﻿--设计--
+--注意：1.用户需被授予connect,resource,create tablespace权限--
+create tablespace stu_manager_system datafile 'd:/stu_manager_sys.dbf' size 50m autoextend on next 10m;
+--更改表空间
+alter database datafile 'd:/stu_manager_sys.dbf' resize 10m;
+create table testTable(
+ id number(3,0),
+ name varchar2(50)
+);
+drop table testTable;
+--------------------------------
+select table_name from user_tables;
+create table stu_base(
+  s_id number(3,0) PRIMARY KEY,
+	name varchar2(50) not NULL,
+	sex nchar(2),
+	age number(3,0) check(age>=0 and age<=130),
+	CONSTRAINT fk_stu_score FOREIGN KEY(score) REFERENCES stu_score(ssid); 
+);
+alter table stu_base drop column score;
+select * from stu_base;
+INSERT into stu_base VALUES(101,'张三丰','男',20);
+INSERT into stu_base VALUES(102,'黄一天','男',22);
+INSERT into stu_base VALUES(103,'范冰热','女',21);
+INSERT into stu_base VALUES(104,'范冰热','女',21,501);
+UPDATE stu_base set()
+);
+create table subject(
+  name varchar2(50) PRIMARY KEY,
+	teacher varchar2(20) not null
+);
+insert into subject (name,teacher) values('计算机组成原理','任文进');
+insert into subject (name,teacher) values('单片机原理','窦亚玲');
+insert into subject (name,teacher) values('专业核心提高','毕夏安');
+drop table stu_score;
+create table stu_score(
+  ssid number(3,0) PRIMARY KEY,
+	subject varchar2(50),
+	score number(3,0) check(score>=0 and score <=150),
+	s_id number(3,0),
+	CONSTRAINT fk_stu_score_subject FOREIGN KEY(subject) REFERENCES subject(name),
+	CONSTRAINT fk_stu_score_s_id FOREIGN KEY(s_id) REFERENCES stu_base(s_id)
+);
+create sequence stu_score_ssid
+increment by 1
+start with 500
+minvalue 500
+nomaxvalue
+nocycle;
+
+--模拟SQL---
+select b.s_id,s.ssid,b.name,s.subject,s.score from stu_score s inner join stu_base b on s.s_id=b.s_id ;
+-----
+drop table stu_score;
+select * from stu_score;
+delete from stu_score;
+insert into stu_score VALUES(stu_score_ssid.nextval,'计算机组成原理',90,101);
+insert into stu_score VALUES(stu_score_ssid.nextval,'单片机原理',92,101);
+insert into stu_score VALUES(stu_score_ssid.nextval,'专业核心提高',90,101);
+/*
+create table class(
+  c_id number(3,0) PRIMARY KEY,
+	c_grade number(1,0),
+	c_teacher varchar2(50),
+	c_room varchar2(50),
+	CONSTRAINT pk_class_greade FOREIGN KEY(c_grade) REFERENCES grade(g_id)
+);
+create table students(
+  id number(3,0) PRIMARY KEY,
+	className number(3,0),
+	subject varchar2(20),
+	score number(3,1),
+	CONSTRAINT pk_student_class FOREIGN KEY(className) REFERENCES class(c_id)
+);
+drop table students;
+*/
+create table users(
+	count varchar2(20),
+	password varchar2(20),
+	privil number(1,0)
+);
+alter table users add CONSTRAINT a123 unique(count);
+drop table users;
+select * from users;
+insert into users values('admin','admin',1);--1超级管理员
+insert into users values('aa','123',2);--2普通用户
